@@ -95,7 +95,7 @@ export class GameScene extends Phaser.Scene {
     setupVirtualJoystick() {
         // Enable virtual joystick strictly only on mobile devices
         const isMobile = !this.sys.game.device.os.desktop;
-        
+
         if (isMobile) {
             this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
                 x: 180,
@@ -292,25 +292,104 @@ export class GameScene extends Phaser.Scene {
         this.player.move(0, 0);
         this.player.setVelocity(0, 0);
 
-        this.statusText.setVisible(true);
-
         if (this.timerSound && this.timerSound.isPlaying) {
             this.timerSound.stop();
         }
 
+        const width = this.cameras.main.width;
+        const height = this.cameras.main.height;
+        const centerX = width / 2;
+
         if (win) {
             this.sound.play('sfx_victory');
-            this.statusText.setText('Вітаємо!\nВи розблокували значок\n"Сила Добра!"');
-            this.statusText.setColor('#00ff00');
+
+            // Dark overlay
+            const overlay = this.add.rectangle(centerX, height / 2, width, height, 0x000000, 0.7);
+            overlay.setDepth(10000);
+
+            // Rotating Light
+            const fxLight = this.add.image(centerX, height * 0.4, 'light_reward').setScale(1.5).setDepth(10001);
+            this.tweens.add({
+                targets: fxLight,
+                rotation: Math.PI * 2,
+                duration: 8000,
+                repeat: -1,
+                ease: 'Linear'
+            });
+
+            // Reward Image
+            const rewardImg = this.add.image(centerX, height * 0.4, 'reward').setDepth(10002);
+            rewardImg.setScale(0); // For pop-in effect
+            this.tweens.add({
+                targets: rewardImg,
+                scale: 1,
+                duration: 500,
+                ease: 'Back.easeOut'
+            });
+
+            // Buttons
+            const btnPlay = this.add.image(centerX, height * 0.7, 'btn_play')
+                .setInteractive({ useHandCursor: true })
+                .setDepth(10002);
+            this.setupButton(btnPlay, width, () => {
+                this.scene.restart(); // Play again restarts the game
+            });
+
+            const btnExit = this.add.image(centerX, height * 0.85, 'btn_exit')
+                .setInteractive({ useHandCursor: true })
+                .setDepth(10002);
+            this.setupButton(btnExit, width, () => {
+                this.scene.start('MenuScene'); // Exit to menu
+            });
+
         } else {
+            this.statusText.setVisible(true);
             this.sound.play('sfx_lose');
             this.statusText.setText('GAME OVER');
             this.statusText.setColor('#ff0000');
-        }
 
-        // Auto return to menu after 5 seconds
-        this.time.delayedCall(5000, () => {
-            this.scene.start('MenuScene');
+            // Auto return to menu after 5 seconds
+            this.time.delayedCall(5000, () => {
+                this.scene.start('MenuScene');
+            });
+        }
+    }
+
+    setupButton(btn, screenWidth, onClick) {
+        // Target button width ~45% of screen
+        const targetBtnWidth = screenWidth * 0.45;
+        const btnScale = targetBtnWidth / btn.width;
+        btn.setScale(btnScale);
+
+        // Button interactions (Smooth, slight animations)
+        btn.on('pointerover', () => {
+            this.tweens.add({
+                targets: btn,
+                scaleX: btnScale * 1.05, // Slightly bigger
+                scaleY: btnScale * 1.05,
+                duration: 100,
+                ease: 'Power1'
+            });
+        });
+
+        btn.on('pointerout', () => {
+            this.tweens.add({
+                targets: btn,
+                scaleX: btnScale,        // Back to normal size
+                scaleY: btnScale,
+                duration: 100,
+                ease: 'Power1'
+            });
+        });
+
+        btn.on('pointerdown', () => {
+            btn.setAlpha(0.8);
+            this.sound.play('sfx_button');
+        });
+
+        btn.on('pointerup', () => {
+            btn.setAlpha(1);
+            onClick();
         });
     }
 }

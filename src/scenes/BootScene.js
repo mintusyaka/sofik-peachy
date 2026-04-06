@@ -22,6 +22,7 @@ export class BootScene extends Phaser.Scene {
         this.load.image('btn_play', 'assets/btn/ui_b_play.png');
         this.load.image('btn_exit', 'assets/btn/ui_b_exit.png');
         this.load.image('how_to_play', 'assets/start-menu/HOWtoPLAY.webp');
+        this.load.image('reward', 'assets/gameplay/reward.png');
 
         // Load Gameplay Assets
         this.load.image('platform', 'assets/gameplay/platform.png');

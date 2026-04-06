@@ -15,7 +15,7 @@ export class TutorialScene extends Phaser.Scene {
         bg.setScale(Math.max(scaleX, scaleY));
 
         // Rotating FX Light positioned exactly behind HOWtoPLAY image
-        const fxLight = this.add.image(centerX, height * 0.45, 'light_reward').setScale(1.5);
+        const fxLight = this.add.image(centerX, height * 0.3, 'light_reward').setScale(1.5);
         this.tweens.add({
             targets: fxLight,
             rotation: Math.PI * 2,
@@ -25,12 +25,12 @@ export class TutorialScene extends Phaser.Scene {
         });
 
         // How to play image
-        const howToImg = this.add.image(centerX, height * 0.45, 'how_to_play');
+        const howToImg = this.add.image(centerX, height * 0.35, 'how_to_play');
         const hScale = Math.min(width * 0.9 / howToImg.width, height * 0.55 / howToImg.height);
         howToImg.setScale(hScale);
 
         // Buttons
-        const overlayPlayBtn = this.add.image(centerX, height * 0.78, 'btn_play')
+        const overlayPlayBtn = this.add.image(centerX, height * 0.7, 'btn_play')
             .setInteractive({ useHandCursor: true });
         this.setupButton(overlayPlayBtn, width, () => {
             this.cameras.main.fadeOut(300, 0, 0, 0);
@@ -39,9 +39,9 @@ export class TutorialScene extends Phaser.Scene {
             });
         });
 
-        const overlayExitBtn = this.add.image(centerX, height * 0.9, 'btn_exit')
+        const overlayExitBtn = this.add.image(centerX, height * 0.85, 'btn_exit')
             .setInteractive({ useHandCursor: true });
-        this.setupButton(overlayExitBtn, width * 0.7, () => { 
+        this.setupButton(overlayExitBtn, width, () => {
             this.scene.start('MenuScene');
         });
     }
