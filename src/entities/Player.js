@@ -64,6 +64,17 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             });
 
             this.setMaxVelocity(this.carryingSpeed);
+
+            // Pop-up glow effect
+            const glow = this.scene.add.sprite(this.x, this.y, 'glow_good').setDepth(this.depth + 10).setScale(0.5);
+            this.scene.tweens.add({
+                targets: glow,
+                scale: 1.5,
+                alpha: { from: 1, to: 0 },
+                duration: 500,
+                ease: 'Quad.easeOut',
+                onComplete: () => glow.destroy()
+            });
         }
     }
 

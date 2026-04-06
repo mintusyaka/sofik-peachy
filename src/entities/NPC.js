@@ -86,6 +86,29 @@ export class NPC extends Phaser.Physics.Arcade.Sprite {
         if (this.state === 'satisfied') {
             this.cooldownRemaining -= delta;
             if (this.cooldownRemaining < 0) this.cooldownRemaining = 0;
+
+            // Continuously spawn hearts flying around
+            if (Math.random() < 0.08) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Phaser.Math.Between(30, 60);
+                const startX = this.x + Math.cos(angle) * distance;
+                const startY = this.y - 40 + Math.sin(angle) * distance;
+                
+                const heart = this.scene.add.sprite(startX, startY, 'vfx_heart')
+                    .setOrigin(0.5).setScale(0.2).setDepth(10000);
+
+                // Float upwards and slightly outwards
+                this.scene.tweens.add({
+                    targets: heart,
+                    y: startY - Phaser.Math.Between(40, 80),
+                    x: startX + Math.cos(angle) * 20,
+                    alpha: { from: 1, to: 0 },
+                    scale: 0.5,
+                    duration: Phaser.Math.Between(1000, 1500),
+                    ease: 'Sine.easeInOut',
+                    onComplete: () => heart.destroy()
+                });
+            }
         }
     }
 }

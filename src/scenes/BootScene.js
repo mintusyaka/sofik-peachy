@@ -33,6 +33,7 @@ export class BootScene extends Phaser.Scene {
         this.load.image('ui_progress', 'assets/gameplay/ui_progress.png');
         this.load.image('ui_progressbar', 'assets/gameplay/ui_progressbar.png');
         this.load.image('vfx_heart', 'assets/fx/vfx_heard.png');
+        this.load.image('glow_good', 'assets/fx/glow_good.png');
         this.load.image('ui_icon_timer', 'assets/gameplay/ui_icon_timer.png');
         this.load.image('ui_icon_element', 'assets/gameplay/ui_icon_element.png');
         this.load.image('element_1', 'assets/gameplay/element_1.png');
