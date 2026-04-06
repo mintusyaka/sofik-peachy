@@ -8,6 +8,15 @@ export class MenuScene extends Phaser.Scene {
         const height = this.cameras.main.height;
         const centerX = width / 2;
 
+        // Start global background music if not already playing
+        let bgm = this.sound.get('music_main');
+        if (!bgm) {
+            bgm = this.sound.add('music_main', { loop: true, volume: 0.3 });
+            bgm.play();
+        } else if (!bgm.isPlaying) {
+            bgm.play();
+        }
+
         // Background
         const bg = this.add.image(centerX, height / 2, 'start_background');
         // Fit background to screen
@@ -105,6 +114,7 @@ export class MenuScene extends Phaser.Scene {
 
         btn.on('pointerdown', () => {
             btn.setAlpha(0.8);
+            this.sound.play('sfx_button');
         });
 
         btn.on('pointerup', () => {

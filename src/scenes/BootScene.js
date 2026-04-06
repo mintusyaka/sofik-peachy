@@ -7,6 +7,14 @@ export class BootScene extends Phaser.Scene {
         // Load joystick plugin
         this.load.plugin('rexvirtualjoystickplugin', 'https://cdn.jsdelivr.net/npm/phaser3-rex-plugins@1.1.39/dist/rexvirtualjoystickplugin.min.js', true);
         
+        // Load Audio
+        this.load.audio('sfx_button', 'assets/audio/button.mp3');
+        this.load.audio('sfx_collect', 'assets/audio/collect_good.mp3');
+        this.load.audio('sfx_lose', 'assets/audio/lose.mp3');
+        this.load.audio('music_main', 'assets/audio/main.mp3');
+        this.load.audio('sfx_victory', 'assets/audio/victory.mp3');
+        this.load.audio('sfx_timer', 'assets/audio/timer.mp3');
+
         // Load Menu Assets
         this.load.image('start_background', 'assets/start-menu/start_background.webp');
         this.load.image('start_name', 'assets/start-menu/start_name.png');

@@ -73,6 +73,7 @@ export class TutorialScene extends Phaser.Scene {
 
         btn.on('pointerdown', () => {
             btn.setAlpha(0.8);
+            this.sound.play('sfx_button');
         });
 
         btn.on('pointerup', () => {

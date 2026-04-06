@@ -93,16 +93,17 @@ export class GameScene extends Phaser.Scene {
     }
 
     setupVirtualJoystick() {
-        // Detect mobile roughly
-        const isMobile = this.cameras.main.width < 800 || this.sys.game.device.os.android || this.sys.game.device.os.iOS;
+        // Enable virtual joystick strictly only on mobile devices
+        const isMobile = !this.sys.game.device.os.desktop;
+        
         if (isMobile) {
             this.joyStick = this.plugins.get('rexvirtualjoystickplugin').add(this, {
-                x: 100,
-                y: this.cameras.main.height - 100,
-                radius: 60,
-                base: this.add.circle(0, 0, 60, 0x888888, 0.5).setDepth(10000),
-                thumb: this.add.circle(0, 0, 25, 0xcccccc, 0.8).setDepth(10000),
-                forceMin: 10,
+                x: 180,
+                y: this.cameras.main.height - 180,
+                radius: 100,
+                base: this.add.circle(0, 0, 100, 0x888888, 0.5).setDepth(10000),
+                thumb: this.add.circle(0, 0, 40, 0xcccccc, 0.8).setDepth(10000),
+                forceMin: 16,
             });
         }
     }
@@ -152,6 +153,8 @@ export class GameScene extends Phaser.Scene {
             // Disable physics so it can't be repeatedly triggered
             item.body.enable = false;
 
+            this.sound.play('sfx_collect');
+
             // Tween the item to the UI Timer Icon
             this.tweens.add({
                 targets: item,
@@ -184,6 +187,7 @@ export class GameScene extends Phaser.Scene {
         } else {
             // Pick up regular item
             if (!player.hasItem) {
+                this.sound.play('sfx_collect');
                 player.pickUpItem(item.texture.key);
                 player.carriedItemScore = item.scoreValue; // Note the score value for delivery
                 item.destroy();
@@ -232,6 +236,19 @@ export class GameScene extends Phaser.Scene {
         if (this.timeRemaining <= 0) {
             this.timeRemaining = 0;
             this.endGame(false);
+        } else {
+            if (this.timeRemaining <= 3000) {
+                if (!this.timerSound) {
+                    this.timerSound = this.sound.add('sfx_timer', { loop: true });
+                    this.timerSound.play();
+                } else if (!this.timerSound.isPlaying) {
+                    this.timerSound.play();
+                }
+            } else if (this.timeRemaining > 5000) {
+                if (this.timerSound && this.timerSound.isPlaying) {
+                    this.timerSound.stop();
+                }
+            }
         }
 
         // Update Time Bar with Crop
@@ -249,17 +266,22 @@ export class GameScene extends Phaser.Scene {
         let dirX = 0;
         let dirY = 0;
 
-        if (this.cursors.left.isDown || this.wasd.A.isDown) dirX = -1;
-        else if (this.cursors.right.isDown || this.wasd.D.isDown) dirX = 1;
+        const isMobile = !this.sys.game.device.os.desktop;
 
-        if (this.cursors.up.isDown || this.wasd.W.isDown) dirY = -1;
-        else if (this.cursors.down.isDown || this.wasd.S.isDown) dirY = 1;
+        if (isMobile) {
+            // Mobile (Virtual Joystick) Controls
+            if (this.joyStick && this.joyStick.force > 0) {
+                const angle = this.joyStick.angle * Math.PI / 180;
+                dirX = Math.cos(angle);
+                dirY = Math.sin(angle);
+            }
+        } else {
+            // PC (Keyboard) Controls
+            if (this.cursors.left.isDown || this.wasd.A.isDown) dirX = -1;
+            else if (this.cursors.right.isDown || this.wasd.D.isDown) dirX = 1;
 
-        // Joystick overrides
-        if (this.joyStick && this.joyStick.force > 0) {
-            const angle = this.joyStick.angle * Math.PI / 180;
-            dirX = Math.cos(angle);
-            dirY = Math.sin(angle);
+            if (this.cursors.up.isDown || this.wasd.W.isDown) dirY = -1;
+            else if (this.cursors.down.isDown || this.wasd.S.isDown) dirY = 1;
         }
 
         this.player.move(dirX, dirY);
@@ -272,10 +294,16 @@ export class GameScene extends Phaser.Scene {
 
         this.statusText.setVisible(true);
 
+        if (this.timerSound && this.timerSound.isPlaying) {
+            this.timerSound.stop();
+        }
+
         if (win) {
+            this.sound.play('sfx_victory');
             this.statusText.setText('Вітаємо!\nВи розблокували значок\n"Сила Добра!"');
             this.statusText.setColor('#00ff00');
         } else {
+            this.sound.play('sfx_lose');
             this.statusText.setText('GAME OVER');
             this.statusText.setColor('#ff0000');
         }
